@@ -1,5 +1,5 @@
 export enum EWorkspaceStatuses {
-    ACTIVE = 'ACTIVE',
-    UNACTIVE = 'UNACTIVE',
-    BOOKED = 'BOOKED',
+    FREE = 'FREE',
+    PASS = 'PASS',
+    BOOKED = 'BOOKED'
 }

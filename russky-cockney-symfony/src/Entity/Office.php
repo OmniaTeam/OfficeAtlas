@@ -36,10 +36,14 @@ class Office
     #[ORM\OneToMany(targetEntity: MapScheme::class, mappedBy: 'office')]
     private Collection $mapSchemes;
 
+    #[ORM\OneToMany(targetEntity: EquipmentCopy::class, mappedBy: 'office')]
+    private Collection $equipmentCopies;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
         $this->mapSchemes = new ArrayCollection();
+        $this->equipmentCopies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +149,17 @@ class Office
             }
         }
 
+        return $this;
+    }
+
+    public function getEquipmentCopies(): Collection
+    {
+        return $this->equipmentCopies;
+    }
+
+    public function setEquipmentCopies(Collection $equipmentCopies): Office
+    {
+        $this->equipmentCopies = $equipmentCopies;
         return $this;
     }
 }

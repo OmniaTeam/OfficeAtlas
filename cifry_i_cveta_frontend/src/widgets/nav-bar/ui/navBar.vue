@@ -26,7 +26,13 @@
             </el-menu-item>
         </div>
         <div>
-            <el-menu-item :index="routes.length + 1">
+            <el-menu-item @click="handleLogout" :index="routes.length + 1">
+                <el-icon><SwitchButton /></el-icon>
+                <template #title>
+                    <span>Выйти</span>
+                </template>
+            </el-menu-item>
+            <el-menu-item :index="routes.length + 2">
                 <el-icon><Setting /></el-icon>
                 <template #title>
                     <span>Настройки</span>
@@ -35,7 +41,7 @@
             <el-menu-item>
                 <el-icon><UserFilled /></el-icon>
                 <template #title>
-                    <span style="overflow: hidden; text-overflow: ellipsis">Имя пользователя №{{ me.myId }}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis">{{ me.myFio }}</span>
                 </template>
             </el-menu-item>
         </div>
@@ -47,8 +53,8 @@ import { useStore } from 'vuex'
 import { getRoutes } from '../lib'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { CaretLeft, CaretRight, Setting, UserFilled } from '@element-plus/icons-vue'
-import type { IMe } from '@/entities'
+import { CaretLeft, CaretRight, Setting, UserFilled, SwitchButton } from '@element-plus/icons-vue'
+import { logout, type IMe } from '@/entities'
 
 const store = useStore()
 const router = useRouter()
@@ -60,6 +66,10 @@ const isCollapse = ref(true)
 
 const navigateTo = (pathName: string) => {
     router.push({ name: pathName })
+}
+
+const handleLogout = async () => {
+    await logout()
 }
 </script>
 

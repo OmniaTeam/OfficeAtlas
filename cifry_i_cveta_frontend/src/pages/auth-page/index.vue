@@ -5,7 +5,7 @@
             <div class="auth-card slide-in">
                 <h1>Добро пожаловать!</h1>
                 <p>Войдите, чтобы начать пользоваться</p>
-                <el-button type="primary" class="auth-button" @click="handleClick"> Войти через Keycloak </el-button>
+                <el-button type="primary" class="auth-button" @click="toAuth()"> Войти через Keycloak </el-button>
             </div>
         </div>
         <div class="background-shapes">
@@ -21,10 +21,11 @@
 </template>
 
 <script lang="ts" setup>
+import { auth } from '@/entities';
 import { ElButton } from 'element-plus'
 
-const handleClick = () => {
-    console.log('Войти через Keycloak')
+const toAuth = async () => {
+    await auth()
 }
 </script>
 

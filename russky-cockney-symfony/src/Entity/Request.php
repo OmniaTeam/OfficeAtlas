@@ -3,8 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\RequestRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RequestRepository::class)]
@@ -30,16 +29,14 @@ class Request
     #[ORM\ManyToOne(inversedBy: 'claim')]
     private ?Employee $specialist = null;
 
-    /**
-     * @var Collection<int, Maintenance>
-     */
-    #[ORM\OneToMany(targetEntity: Maintenance::class, mappedBy: 'request')]
-    private Collection $maintenances;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $dateStart = null;
 
-    public function __construct()
-    {
-        $this->maintenances = new ArrayCollection();
-    }
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $dateEnd = null;
+
+    #[ORM\ManyToOne(inversedBy: 'requests')]
+    private ?EquipmentCopy $equipmentCopy = null;
 
     public function getId(): ?int
     {
@@ -94,36 +91,6 @@ class Request
         return $this;
     }
 
-    /**
-     * @return Collection<int, Maintenance>
-     */
-    public function getMaintenances(): Collection
-    {
-        return $this->maintenances;
-    }
-
-    public function addMaintenance(Maintenance $maintenance): static
-    {
-        if (!$this->maintenances->contains($maintenance)) {
-            $this->maintenances->add($maintenance);
-            $maintenance->setRequest($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMaintenance(Maintenance $maintenance): static
-    {
-        if ($this->maintenances->removeElement($maintenance)) {
-            // set the owning side to null (unless already changed)
-            if ($maintenance->getRequest() === $this) {
-                $maintenance->setRequest(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getSpecialist(): ?Employee
     {
         return $this->specialist;
@@ -132,6 +99,50 @@ class Request
     public function setSpecialist(?Employee $specialist): Request
     {
         $this->specialist = $specialist;
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeImmutable
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeImmutable $date): Request
+    {
+        $this->date = $date;
+        return $this;
+    }
+
+    public function getDateStart(): ?\DateTimeImmutable
+    {
+        return $this->dateStart;
+    }
+
+    public function setDateStart(?\DateTimeImmutable $dateStart): Request
+    {
+        $this->dateStart = $dateStart;
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTimeImmutable
+    {
+        return $this->dateEnd;
+    }
+
+    public function setDateEnd(?\DateTimeImmutable $dateEnd): Request
+    {
+        $this->dateEnd = $dateEnd;
+        return $this;
+    }
+
+    public function getEquipmentCopy(): ?EquipmentCopy
+    {
+        return $this->equipmentCopy;
+    }
+
+    public function setEquipmentCopy(?EquipmentCopy $equipmentCopy): Request
+    {
+        $this->equipmentCopy = $equipmentCopy;
         return $this;
     }
 }

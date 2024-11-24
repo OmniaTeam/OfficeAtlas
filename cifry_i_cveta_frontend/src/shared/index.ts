@@ -1,2 +1,3 @@
 export * from './lib'
-export * from './drag-zoom-module/types'
+export * from './ui'
+export * from './api'

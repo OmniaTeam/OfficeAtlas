@@ -3,38 +3,38 @@
 namespace App\Controller\Employee;
 
 use App\Entity\Employee;
-use App\Repository\EmployeeRepository;
 use App\Service\Employee\EmployeeService;
+use Doctrine\ORM\EntityManagerInterface;
+use OpenApi\Attributes\Tag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/employee')]
+#[Tag('Сотрудники')]
 class EmployeeController extends AbstractController
 {
     public function __construct(
         private EmployeeService $employeeService,
         private SerializerInterface $serializer,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
     #[Route('/', name: 'employee_index', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
-        $page = $request->query->getInt('page', 1);
-        $perPage = $request->query->getInt('perPage', 20);
-        $employees = $this->employeeService->getEmployeesByPagination($page, $perPage);
-        return $this->json(
-            $employees
-        );
+        $filter = $request->query->all();
+        $employees = $this->employeeService->getEmployeesByPagination($filter);
+        return $this->json($employees);
     }
 
-    #[Route('/show', name: 'employee_show', methods: ['GET'])]
-    public function show(Request $request): JsonResponse
+    #[Route('/{id}/show', name: 'employee_show', methods: ['GET'])]
+    public function show(string $id): JsonResponse
     {
-        $id = $request->query->getInt('id');
         $employee = $this->employeeService->getEmployeeById($id);
         if (!$employee) {
             return $this->json([
@@ -43,12 +43,6 @@ class EmployeeController extends AbstractController
             ], 404);
         }
         return $this->json($employee);
-    }
-
-    #[Route('/test')]
-    public function test(EmployeeRepository $repository): JsonResponse
-    {
-        dd($repository->findAllSysAdminWithInProgressRequests());
     }
 
     #[Route('/import/', name: 'employee_import', methods: ['POST'])]
@@ -61,5 +55,25 @@ class EmployeeController extends AbstractController
         }
         $status = $this->employeeService->importEmployee($users);
         return $this->json(['success' => $status]);
+    }
+
+    #[Route('/free', name: 'employee_free', methods: ['GET'])]
+    public function getFreeEmployees(Request $request): JsonResponse
+    {
+        $userId = $this->getUser()->getId();
+        $employeeRepository = $this->entityManager->getRepository(Employee::class);
+        $user = $employeeRepository->find($userId);
+        if ($user === null) {
+            return $this->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+        $employees = $this->employeeService->getFreeEmployees($user->getOffice()->getId());
+        return $this->json($employees, context: [
+            AbstractNormalizer::ATTRIBUTES => [
+                'id', 'fio'
+            ]
+        ]);
     }
 }

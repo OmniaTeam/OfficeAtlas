@@ -1,16 +1,13 @@
-// import { fetchMe } from "../api";
 import { getMyActions } from '@/shared'
 import { EActions, ERoles } from './enums'
 import type { IMe } from './interfaces'
+import { fetchMe } from '../api'
 
 export const module = {
     namespaced: true,
     state: {
         fetchMeState: '',
-        me: {
-            myId: 0,
-            myRole: ERoles.MANAGER,
-        } as IMe,
+        me: {} as IMe,
         myActions: [] as EActions[],
     },
     getters: {
@@ -22,8 +19,29 @@ export const module = {
         },
     },
     mutations: {
-        setMe(state: any, data: IMe) {
-            state.me = data
+        setMe(state: any, data: {
+            equipmentCopies: any[],
+            id: number,
+            fio: string,
+            specialization: string,
+            department: string,
+            phone: string,
+            link: string,
+            email: string,
+            role: string,
+            office: {
+                id: number,
+                name: string
+            }
+        }) {
+            state.me.myId = data.id,
+            state.me.myRole = data.role
+            state.me.myFio = data.fio
+            state.me.mySpec = data.specialization
+            state.me.myDepartment = data.department
+            state.me.myPhone = data.phone
+            state.me.myEmail = data.email
+            state.me.myLink = data.link
         },
         setFetchMeState(state: any, data: string) {
             state.fetchMeState = data
@@ -36,10 +54,18 @@ export const module = {
         async getMe({ commit }: any) {
             commit('setFetchMeState', 'PENDING')
             try {
-                // Делать запрос на получение информации по пользователю
-                // Присваивать полученные данные в стейт me
-                // Получить все права по полученному role
-                commit('setFetchMeState', 'SUCCESS')
+
+                await fetchMe().then((res) => {
+                    if (res.status === 200) {
+                        console.log(res)
+                        commit('setMe', res.data)
+                        commit('setMyActions', getMyActions(res.data.role))
+                        console.log(getMyActions(res.data.role))
+                        commit('setFetchMeState', 'SUCCESS')
+                    } else {
+                        commit('setFetchMeState', 'ERROR')
+                    }
+                })
             } catch (error) {
                 console.error('Failed to fetch me', error)
                 commit('setFetchMeState', 'ERROR')

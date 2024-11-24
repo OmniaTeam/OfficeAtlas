@@ -16,14 +16,26 @@ class ExternalClient
         $this->client = new Client(['base_uri' => $this->baseUrl]);
     }
 
-    public function sendEmail(SendEmailDTO $data): array
+    public function sendEmail(SendEmailDTO $data): bool
     {
-        $payload = $this->serializer->serialize($data, 'json');
-        #TODO Узнать и заполнить
-        $res = $this->client->post('/', [
-            'body' => $payload,
-        ]);
-        return $this->serializer->deserialize($res->getBody()->getContents(), 'array', 'json');
+        try {
+            $payload = $this->serializer->serialize($data, 'json');
+            $res = $this->client->post('send_request', [
+                'body' => $payload,
+            ]);
+            if ($res->getStatusCode() !== 200) {
+                return false;
+            }
+            return true;
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 
+    public function getSpec(): string
+    {
+        $res = $this->client->get('spec');
+        $response = json_decode($res->getBody()->getContents(), JSON_OBJECT_AS_ARRAY);
+        return $response['spec_id'];
+    }
 }

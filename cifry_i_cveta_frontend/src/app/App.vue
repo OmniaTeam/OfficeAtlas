@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { Routing } from '@/pages'
-import { ApplicationLayout } from './layouts'
+import { ApplicationLayout, AuthProvider } from './layouts'
 </script>
 
 <template>
-    <ApplicationLayout>
-        <Routing />
-    </ApplicationLayout>
+    <AuthProvider>
+        <ApplicationLayout>
+            <Routing />
+        </ApplicationLayout>
+    </AuthProvider>
 </template>
 
 <style lang="scss">

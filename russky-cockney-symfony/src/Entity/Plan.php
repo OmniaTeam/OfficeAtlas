@@ -26,10 +26,10 @@ class Plan
     private ?string $type = null;
 
     #[ORM\Column]
-    private ?int $locX = null;
+    private ?int $x = null;
 
     #[ORM\Column]
-    private ?int $locY = null;
+    private ?int $y = null;
 
     #[ORM\Column]
     private ?int $height = null;
@@ -78,26 +78,26 @@ class Plan
         return $this;
     }
 
-    public function getLocX(): ?int
+    public function getX(): ?int
     {
-        return $this->locX;
+        return $this->x;
     }
 
-    public function setLocX(int $locX): static
+    public function setX(int $x): static
     {
-        $this->locX = $locX;
+        $this->x = $x;
 
         return $this;
     }
 
-    public function getLocY(): ?int
+    public function getY(): ?int
     {
-        return $this->locY;
+        return $this->y;
     }
 
-    public function setLocY(int $locY): static
+    public function setY(int $y): static
     {
-        $this->locY = $locY;
+        $this->y = $y;
 
         return $this;
     }

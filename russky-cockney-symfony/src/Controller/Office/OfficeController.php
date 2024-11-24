@@ -7,6 +7,7 @@ use App\Entity\Employee;
 use App\Entity\Office;
 use App\Service\Employee\EmployeeService;
 use App\Service\Office\OfficeService;
+use OpenApi\Attributes\Tag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/offices')]
+#[Tag('Офисы')]
 class OfficeController extends AbstractController
 {
     public function __construct(
@@ -29,16 +31,7 @@ class OfficeController extends AbstractController
         return $this->json(
             $this->officeService->getAllOffices(),
             context: [
-                AbstractNormalizer::CALLBACKS => [
-                    'cabinets' => function ($object) {
-                        return $object instanceof Cabinet ? [
-                            'id' => $object->getId(),
-                            'number' => $object->getNumber(),
-                            'department' => $object->getDepartment(),
-                        ] : [];
-                    }
-                ],
-                AbstractNormalizer::IGNORED_ATTRIBUTES => ['employees']
+                AbstractNormalizer::IGNORED_ATTRIBUTES => ['employees', 'mapSchemes']
             ]
         );
     }
@@ -58,6 +51,21 @@ class OfficeController extends AbstractController
             'success' => true,
             'message' => 'Office created.',
         ], 201);
+    }
+
+    #[Route('/{id}/map-schemes', name: 'office_map_schemes', methods: ['GET'])]
+    public function getMapSchemes(int $id): JsonResponse
+    {
+        $result = $this->officeService->getMapSchemesById($id);
+        if (!$result) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Map schemes could not be found.',
+            ], 404);
+        }
+        return $this->json($result, context: [
+            AbstractNormalizer::IGNORED_ATTRIBUTES  => ['office', 'plans']
+        ]);
     }
 
     #[Route('/{id}/employee/import', name: 'office_employee_import', methods: ['POST'])]

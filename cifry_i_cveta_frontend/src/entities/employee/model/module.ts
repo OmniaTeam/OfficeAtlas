@@ -1,4 +1,7 @@
+import type { ERoles } from '@/entities/me'
+import type { EDepartments, ESpecs } from './enums'
 import type { IEmployee } from './interfaces'
+import { fetchEmployees } from '../api'
 
 export const module = {
     namespaced: true,
@@ -6,9 +9,9 @@ export const module = {
         fetchEmployees: '',
         employees: {
             pagination: {
-                limit: 10,
-                page: 1,
-                totalCount: null,
+                perPage: 10,
+                currentPage: 1,
+                total: null,
             },
             employees: [] as IEmployee[],
         },
@@ -35,15 +38,40 @@ export const module = {
             state: any,
             data: {
                 pagination: {
-                    limit: number
-                    page: number
-                    totalCount: number
+                    perPage: number
+                    currentPage: number
+                    total: number
                 }
-                employees: IEmployee[]
+                data: {
+                    id: string,
+                    fio: string,
+                    specialization: ESpecs,
+                    department: EDepartments,
+                    phone: string,
+                    link: string,
+                    email: string,
+                    role: ERoles,
+                    office: {
+                        id: number,
+                        name: string
+                    }
+                }[]
             },
         ) {
             state.employees.pagination = data.pagination
-            state.employees.employees = data.employees
+            state.employees.employees = []
+
+            data.data.map((value) => {
+                state.employees.employees.push({
+                    employeeId: value.id,
+                    employeeFio: value.fio,
+                    employeeSpec: value.specialization,
+                    employeeDepartment: value.department,
+                    employeePhone: value.phone,
+                    employeeLink: value.link,
+                    employeeEmail: value.email
+                })
+            })
         },
         setEmployee(state: any, data: IEmployee) {
             state.employee = data
@@ -51,12 +79,12 @@ export const module = {
         setPagination(
             state: any,
             data: {
-                limit: number
-                page: number
+                perPage: number
+                currentPage: number
             },
         ) {
-            state.employees.pagination.limit = data.limit
-            state.employees.pagination.page = data.page
+            state.employees.pagination.perPage = data.perPage
+            state.employees.pagination.currentPage = data.currentPage
         },
     },
     actions: {
@@ -65,15 +93,23 @@ export const module = {
             input: {
                 filters: any
                 pagination: {
-                    limit: number
-                    page: number
+                    perPage: number
+                    currentPage: number
                 }
             },
         ) {
             console.log(input.filters, input.pagination)
             commit('setFetchEmployees', 'PENDING')
             try {
-                commit('setFetchEmployees', 'SUCCESS')
+                await fetchEmployees({pagination: input.pagination, filter: input.filters}).then((res) => {
+                    if (res.status === 200) {
+                        console.log(res.data)
+                        commit('setEmployees', res.data)
+                        commit('setFetchEmployees', 'SUCCESS')
+                    } else {
+                        commit('setFetchEmployees', 'ERROR')
+                    }
+                })
             } catch (error) {
                 console.log(error)
                 commit('setFetchEmployees', 'ERROR')
@@ -92,8 +128,8 @@ export const module = {
         updatePagination(
             { commit }: any,
             pagination: {
-                limit: number
-                page: number
+                perPage: number
+                currentPage: number
             },
         ) {
             commit('setPagination', pagination)

@@ -4,12 +4,14 @@ namespace App\Controller\Cabinet;
 
 use App\Entity\Office;
 use App\Service\Cabinet\CabinetService;
+use OpenApi\Attributes\Tag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 #[Route('/api/cabinets')]
+#[Tag('Кабинеты')]
 class CabinetController extends AbstractController
 {
     public function __construct(

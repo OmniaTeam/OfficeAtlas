@@ -1,11 +1,14 @@
 mainick_keycloak_security_auth_connect:
   path:       /api/auth/keycloak/connect
+  methods: ['GET']
   controller: Mainick\KeycloakClientBundle\Controller\KeycloakController::connect
 
 mainick_keycloak_security_auth_connect_check:
   path:       /api/auth/keycloak/check
+  methods: ['GET']
   controller: Mainick\KeycloakClientBundle\Controller\KeycloakController::connectCheck
 
 mainick_keycloak_security_auth_logout:
   path:       /api/auth/keycloak/logout
+  methods: ['GET']
   controller: Mainick\KeycloakClientBundle\Controller\KeycloakController::logout

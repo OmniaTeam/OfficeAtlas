@@ -3,8 +3,8 @@
 namespace App\Service\EquipmentCopy;
 
 use App\Entity\Employee;
-use App\Entity\Equipment;
 use App\Entity\EquipmentCopy;
+use App\Entity\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -37,6 +37,17 @@ class EquipmentCopyService
                         'id' => $employee->getId(),
                         'fio' => $employee->getFio(),
                     ] : null;
+                },
+                'requests' => function ($requests) {
+                    $result = [];
+                    foreach ($requests as $request) {
+                        $result[] = $request instanceof Request ? [
+                            'id' => $request->getId(),
+                            'type' => $request->getType(),
+                            'status' => $request->getStatus(),
+                        ] : null;
+                    }
+                    return $result;
                 }
             ]
         ]);

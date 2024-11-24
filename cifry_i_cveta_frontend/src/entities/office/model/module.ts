@@ -1,20 +1,17 @@
+import { fetchOffices } from '../api'
 import type { IOffice } from './interfaces'
 
 export const module = {
     namespaced: true,
     state: {
         fetchOffices: '',
-        offices: {
-            pagination: {
-                limit: 10,
-                page: 1,
-                totalCount: null,
-            },
-            offices: [] as IOffice[],
-        },
+        offices: [] as IOffice[],
 
         fetchOffice: '',
         office: {} as IOffice,
+
+        createOffice: '',
+        
     },
     getters: {
         getOffices(state: any) {
@@ -34,46 +31,52 @@ export const module = {
         setOffices(
             state: any,
             data: {
-                pagination: {
-                    limit: number
-                    page: number
-                    totalCount: number
-                }
-                offices: IOffice[]
-            },
+                id: number,
+                name: string,
+                address: string,
+                numberOfJobs: number,
+                numberLevel: number,
+                cabinets: any[]
+            }[]
         ) {
-            state.offices.pagination = data.pagination
-            state.offices.offices = data.offices
+            state.offices = []
+            data.map((value) => {
+                state.offices.push({
+                    officeId: value.id,
+                    officeName: value.name,
+                    officeAdress: value.address,
+                    officeEmployeenum: value.numberOfJobs,
+                    officeLevelsnum: value.numberLevel
+                })
+            })
         },
-        setOffice(state: any, data: IOffice) {
-            state.office = data
-        },
-        setPagination(
-            state: any,
-            data: {
-                limit: number
-                page: number
-            },
-        ) {
-            state.offices.pagination.limit = data.limit
-            state.offices.pagination.page = data.page
-        },
+        setOffice(state: any, data: {
+            id: number,
+            name: string,
+            address: string,
+            numberOfJobs: number,
+            numberLevel: number,
+            cabinets: any[]
+        }) {
+            state.office.officeId = data.id
+            state.office.officeName = data.name
+            state.office.officeAdress = data.address
+            state.office.officeEmployeenum = data.numberOfJobs
+            state.office.officeLevelsnum = data.numberLevel
+        }
     },
     actions: {
-        async getOffices(
-            { commit }: any,
-            input: {
-                filters: any
-                pagination: {
-                    limit: number
-                    page: number
-                }
-            },
-        ) {
-            console.log(input.filters, input.pagination)
+        async getOffices({ commit }: any) {
             commit('setFetchOffices', 'PENDING')
             try {
-                commit('setFetchOffices', 'SUCCESS')
+                await fetchOffices().then((resp) => {
+                    if (resp.status === 200) {
+                        commit('setOffices', resp.data)
+                        commit('setFetchOffices', 'SUCCESS')
+                    } else {
+                        commit('setFetchOffices', 'ERROR')
+                    }
+                })
             } catch (error) {
                 console.log(error)
                 commit('setFetchOffices', 'ERROR')
@@ -88,15 +91,6 @@ export const module = {
                 console.log(error)
                 commit('setFetchOffice', 'ERROR')
             }
-        },
-        updatePagination(
-            { commit }: any,
-            pagination: {
-                limit: number
-                page: number
-            },
-        ) {
-            commit('setPagination', pagination)
         },
     },
 }

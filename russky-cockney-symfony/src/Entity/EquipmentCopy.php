@@ -40,17 +40,16 @@ class EquipmentCopy
     #[ORM\ManyToOne(inversedBy: 'equipmentCopies')]
     private ?Employee $employee = null;
 
-    /**
-     * @var Collection<int, Maintenance>
-     */
-    #[ORM\OneToMany(targetEntity: Maintenance::class, mappedBy: 'equipmentCopy')]
-    private Collection $maintenances;
+    #[ORM\OneToMany(targetEntity: EquipmentCopy::class, mappedBy: 'equipmentCopy')]
+    private Collection $requests;
+
+    #[ORM\ManyToOne(inversedBy: 'equipmentCopies')]
+    private ?Office $office = null;
 
     public function __construct()
     {
-        $this->maintenances = new ArrayCollection();
+        $this->requests = new ArrayCollection();
     }
-
 
     public function getEmployee(): ?Employee
     {
@@ -116,36 +115,6 @@ class EquipmentCopy
         return $this;
     }
 
-    /**
-     * @return Collection<int, Maintenance>
-     */
-    public function getMaintenances(): Collection
-    {
-        return $this->maintenances;
-    }
-
-    public function addMaintenance(Maintenance $maintenance): static
-    {
-        if (!$this->maintenances->contains($maintenance)) {
-            $this->maintenances->add($maintenance);
-            $maintenance->setEquipmentCopy($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMaintenance(Maintenance $maintenance): static
-    {
-        if ($this->maintenances->removeElement($maintenance)) {
-            // set the owning side to null (unless already changed)
-            if ($maintenance->getEquipmentCopy() === $this) {
-                $maintenance->setEquipmentCopy(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getName(): ?string
     {
         return $this->name;
@@ -176,6 +145,28 @@ class EquipmentCopy
     public function setType(?string $type): EquipmentCopy
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getRequests(): Collection
+    {
+        return $this->requests;
+    }
+
+    public function setRequests(Collection $requests): EquipmentCopy
+    {
+        $this->requests = $requests;
+        return $this;
+    }
+
+    public function getOffice(): ?Office
+    {
+        return $this->office;
+    }
+
+    public function setOffice(?Office $office): EquipmentCopy
+    {
+        $this->office = $office;
         return $this;
     }
 }
