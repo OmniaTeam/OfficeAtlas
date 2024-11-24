@@ -33,19 +33,19 @@ type UserSymphony struct {
 }
 
 type SendData struct {
-	IdRequest          int    `json:"id_request" binding:"required,gte=1"`
-	TypeRequest        string `json:"type_request" binding:"required"`
-	StatusRequest      string `json:"status_request" binding:"required"`
-	DescriptionRequest string `json:"description_request" binding:"required"`
-	FioEmployee        string `json:"fio_employee" binding:"required"`
-	PhoneEmployee      string `json:"phone_employee" binding:"required"`
-	EmailEmployee      string `json:"email_employee" binding:"required"`
-	LinkEmployee       string `json:"link_employee" binding:"required"`
-	NameWorkplace      string `json:"name_workplace" binding:"required"`
-	NumberCabinet      string `json:"number_cabinet" binding:"required"`
-	NumberWorkplace    string `json:"number_workplace" binding:"required"`
-	NameDepartment     string `json:"name_department" binding:"required"`
-	NameOffice         string `json:"name_office" binding:"required"`
+	IdRequest          int    `json:"id_request" binding:"gte=1"`
+	TypeRequest        string `json:"type_request"`
+	StatusRequest      string `json:"status_request"`
+	DescriptionRequest string `json:"description_request"`
+	FioEmployee        string `json:"fio_employee"`
+	PhoneEmployee      string `json:"phone_employee"`
+	EmailEmployee      string `json:"email_employee"`
+	LinkEmployee       string `json:"link_employee"`
+	NameWorkplace      string `json:"name_workplace"`
+	NumberCabinet      string `json:"number_cabinet"`
+	NumberWorkplace    string `json:"number_workplace"`
+	NameDepartment     string `json:"name_department"`
+	NameOffice         string `json:"name_office"`
 
 	EmailAdmin string `json:"email_admin" binding:"required"`
 }
@@ -53,7 +53,7 @@ type SendData struct {
 func SendRequest(c *gin.Context) {
 	var data SendData
 	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(400, err)
+		c.JSON(400, err.Error())
 		return
 	}
 
